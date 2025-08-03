@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:15
+    container_name: game-db
+    restart: always
+    environment:
+      POSTGRES_USER: wip-admin
+      POSTGRES_PASSWORD: whatpassword
+      POSTGRES_DB: mygame_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    image: lostyguy/wip:Beta-1.2
+    container_name: Fast-backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg2://wip-admin:whatpassword@db:5432/mygame_db
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
