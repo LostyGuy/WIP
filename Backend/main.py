@@ -1,11 +1,16 @@
 import uvicorn
 from fastapi import FastAPI
 
-app = FastAPI()
+class GameBackend:
+    def __init__(self):
+        self.app = FastAPI(title="Game Backend API")
+        self.root_site()
 
-@app.get("/")
-async def root() -> None:
-    return {"NonE":"NonE"}
+    def root_site(self):
+        @self.app.get("/")
+        async def root() -> None:
+            return {"NonE":"NonE"}
+
 
 if __name__ == "__main__":
-    uvicorn.run(app, port=8000, host="0.0.0.0")
+    uvicorn.run(GameBackend().app, port=8000, host="0.0.0.0")
