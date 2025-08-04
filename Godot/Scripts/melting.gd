@@ -1,58 +1,48 @@
 extends Node2D
+@export var oreType : Ore
+@onready var scene_changer: Node = $SceneChanger
 
-@onready var percantage_label: Label = $Percantage_label
+@onready var finish_button: Button = $FinishButton
+@onready var timer: Timer = $Timer
+@onready var texture_progress_bar: TextureProgressBar = $TextureProgressBar
+@onready var melting_timer: Timer = $MeltingTimer
 @onready var rating_label: Label = $Rating_label
 
-
-enum States {NONE, SLOW, AVERAGE, FAST, SPILL}
-
-@export var slow := 0.30
-@export var average := 0.80
-@export var fast := 0.90
-@export var speed_modifier := 4
-
+var is_running := true
 var rating := 1.0
-var percantage := 0.0
-var speed: States = States.NONE
-
 
 func _ready() -> void:
-	#Only debug purposes
-	percantage_label.text = "Completion: " + str(round(percantage*10000)/100) + "%"
-	rating_label.text = "Rating: " + str(round(rating*10000)/100) + "%"
+	melting_timer.wait_time = oreType.melting_timer
+	melting_timer.start()
+	Engine.time_scale = 1
+	texture_progress_bar.value = 0.0
+	finish_button.hide()
 
 func _process(delta: float) -> void:
-	#Changing the percantage based on the force of the pull
-	match speed:
-		States.NONE: return
-		States.SLOW: percantage += slow/speed_modifier * delta
-		States.AVERAGE: percantage += average/speed_modifier * delta
-		States.FAST: percantage += fast/speed_modifier * delta
-		States.SPILL: 
-			percantage += fast/speed_modifier * delta
-			rating -= 0.1 * delta
-	
-	#Only debug purposes
-	percantage = clamp(percantage, 0, 1)
-	percantage_label.text = "Completion: " + str(round(percantage*10000)/100) + "%"
+	if not is_running:
+		return
+	var current_percentage = 1 - melting_timer.time_left/melting_timer.wait_time
+	if current_percentage > 0.90:
+		rating = clamp(rating - delta/10, 0, 1) 
+		
+	if current_percentage > 0.75 and not finish_button.is_visible_in_tree():
+		finish_button.show()
+		
+	texture_progress_bar.value = current_percentage
+	 
 	rating_label.text = "Rating: " + str(round(rating*10000)/100) + "%"
-	print(rating)
+
+func _on_speed_up_button_pressed() -> void:
+	Engine.time_scale = clamp(Engine.time_scale * oreType.modifier_acceleration, oreType.min_modifier, oreType.max_modifier)
+	timer.start()
+
+func _on_finish_button_pressed() -> void:
+	is_running = false
+	melting_timer.stop()
+	scene_changer._change_scene()
 	
 
-func _on_chain_pulling(height: float, maximum_height: float) -> void:
-	#Assesing the speed of pouring
-	var height_percantage : float = height/maximum_height
-	if height_percantage == 0.0:
-		speed = States.NONE
-	elif height_percantage <= slow:
-		speed = States.SLOW
-	elif height_percantage <= average:
-		speed = States.AVERAGE
-	elif height_percantage <= fast:
-		speed = States.FAST
-	else:
-		speed = States.SPILL
-
-
-func _on_chain_pulling_ended() -> void:
-	speed = States.NONE
+func _on_timer_timeout() -> void:
+	if Engine.time_scale != oreType.min_modifier:
+		Engine.time_scale = clamp(Engine.time_scale / oreType.modifier_acceleration, oreType.min_modifier, oreType.max_modifier)
+		timer.start()

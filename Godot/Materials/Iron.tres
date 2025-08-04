@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Ore" load_steps=2 format=3 uid="uid://erj4f8lsc7ip"]
+
+[ext_resource type="Script" uid="uid://xr28kt54uxa2" path="res://Scripts/OreResource.gd" id="1_ee5py"]
+
+[resource]
+script = ExtResource("1_ee5py")
+min_modifier = 1
+max_modifier = 3
+melting_timer = 25
+metadata/_custom_type_script = "uid://xr28kt54uxa2"

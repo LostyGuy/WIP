@@ -1,49 +1,65 @@
-[gd_scene load_steps=4 format=3 uid="uid://cau3a0khxe8g5"]
+[gd_scene load_steps=8 format=3 uid="uid://b43nqccqkpt1r"]
 
-[ext_resource type="Script" uid="uid://cfa2xv4bye68u" path="res://Scripts/melting.gd" id="1_fb7nv"]
-[ext_resource type="Script" uid="uid://emaitiducose" path="res://Scripts/chain.gd" id="2_ncu5c"]
+[ext_resource type="Script" uid="uid://bkvrnbxnknbxr" path="res://Scripts/melting.gd" id="1_e3wic"]
+[ext_resource type="Texture2D" uid="uid://16rpb6scsvfg" path="res://Assets/32x32 circle bar under.png" id="1_ncu5c"]
+[ext_resource type="Texture2D" uid="uid://5x5nf55ts5vd" path="res://Assets/pixil-frame-0.png" id="2_e3wic"]
+[ext_resource type="Resource" uid="uid://o3enteg3flvd" path="res://Materials/Silver.tres" id="2_qxdbh"]
+[ext_resource type="Texture2D" uid="uid://dpljy3weceluo" path="res://Assets/32x32 circle bar progress blue.png" id="4_e3wic"]
+[ext_resource type="PackedScene" uid="uid://bpyaxiap5gs6q" path="res://Scenes/scene_changer.tscn" id="6_w5tfn"]
+[ext_resource type="PackedScene" uid="uid://cau3a0khxe8g5" path="res://Scenes/Pouring.tscn" id="7_w5tfn"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_e4s63"]
-size = Vector2(42.5, 47.5)
+[node name="Melting" type="Node2D"]
+script = ExtResource("1_e3wic")
+oreType = ExtResource("2_qxdbh")
 
-[node name="Pouring" type="Node2D"]
-script = ExtResource("1_fb7nv")
+[node name="SpeedUpButton" type="Button" parent="."]
+offset_left = 499.0
+offset_top = 516.0
+offset_right = 579.0
+offset_bottom = 547.0
+text = "Speed up"
 
-[node name="Chain" type="Sprite2D" parent="."]
-position = Vector2(878, 322)
-script = ExtResource("2_ncu5c")
-maximum_height = 100.0
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+offset_left = 341.0
+offset_top = 87.0
+offset_right = 381.0
+offset_bottom = 127.0
+scale = Vector2(9.95661, 9.95661)
+max_value = 1.0
+step = 0.0
+fill_mode = 4
+nine_patch_stretch = true
+texture_under = ExtResource("1_ncu5c")
+texture_over = ExtResource("2_e3wic")
+texture_progress = ExtResource("4_e3wic")
+tint_over = Color(1, 1, 1, 0.745098)
 
-[node name="PullArea" type="Area2D" parent="Chain"]
+[node name="FinishButton" type="Button" parent="."]
+offset_left = 904.0
+offset_top = 300.0
+offset_right = 955.0
+offset_bottom = 331.0
+text = "finish"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Chain/PullArea"]
-position = Vector2(0, 108)
-shape = SubResource("RectangleShape2D_e4s63")
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
 
-[node name="ColorRect" type="ColorRect" parent="Chain"]
-offset_left = -5.0
-offset_top = -115.0
-offset_right = 5.0
-offset_bottom = 116.0
-mouse_filter = 2
-metadata/_edit_use_anchors_ = true
-
-[node name="Percantage_label" type="Label" parent="."]
-offset_left = 57.0
-offset_top = 192.0
-offset_right = 200.0
-offset_bottom = 329.0
-theme_override_font_sizes/font_size = 60
-text = "0%"
+[node name="MeltingTimer" type="Timer" parent="."]
+wait_time = 10.0
+one_shot = true
 
 [node name="Rating_label" type="Label" parent="."]
-offset_left = 58.0
-offset_top = 302.0
-offset_right = 201.0
-offset_bottom = 439.0
+offset_left = 9.0
+offset_top = 10.0
+offset_right = 152.0
+offset_bottom = 147.0
 theme_override_font_sizes/font_size = 60
 text = "0%"
 
-[connection signal="pulling" from="Chain" to="." method="_on_chain_pulling"]
-[connection signal="pulling_ended" from="Chain" to="." method="_on_chain_pulling_ended"]
-[connection signal="input_event" from="Chain/PullArea" to="Chain" method="_on_pull_area_input_event"]
+[node name="SceneChanger" parent="." instance=ExtResource("6_w5tfn")]
+next_scene = ExtResource("7_w5tfn")
+
+[connection signal="pressed" from="SpeedUpButton" to="." method="_on_speed_up_button_pressed"]
+[connection signal="pressed" from="FinishButton" to="." method="_on_finish_button_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
