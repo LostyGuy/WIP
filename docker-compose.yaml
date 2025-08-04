@@ -13,7 +13,7 @@ services:
       - "5432:5432"
 
   backend:
-    image: lostyguy/wip:Beta-1.2
+    image: lostyguy/wip:Beta-1.3.3
     container_name: Fast-backend
     depends_on:
       - db
